@@ -1,0 +1,123 @@
+h1. The challenge
+
+The Merb advent calendar is a set of 24 tutorials. That's right, every day including week-ends, a new tutorial will be published. 
+Each tutorial is meant to last less than one hour, and will be the occasion to see the ongoing development of a web 2.0 application, from A to Z. 
+The resulting application will be put online, and the source code made open source. This application will be usable, interesting, useful, and fun.
+Twenty-four times less than one hour equals less than a day, and we think that's exactly how long it takes for a developer to learn Merb. 
+Every day, new features will be added to the application, and through these new features we'll show you how to take advantage of Merb's functionality 
+as well as good practices in developing with Merb. 
+Every day, you will realize how fast and efficient it is to develop a web app with Merb, and you will want to know more.
+Considering that it wouldn't be enough of a challenge with just that, and also because we are lazy folks, we have no plans for the 21st day.
+
+h1. The project
+
+The application to be designed could have been a trivial "show-and-tell" application, like a to-do
+end list, a phone book, or a bookstore. But we want to use Merb on an original project, something useful, with numerous features and an important size. 
+The goal is really to prove that Merb can be used in complex situations, to develop professional applications with style and little effort.
+We also hope that lots of people will actually use the application, in order to show that a Merb website can support an important load. 
+That's why the application needs to bring an actual service, and to answer an existing need - or to create a new one. 
+The launch of the website will be a live stress test; this also means that we will need you, humble readers, to digg/bookmark/blog the site and talk about 
+it in real life to check how many visits it can support.
+The content of the project will be kept secret for another day. We still have much to do end today without describing a full-featured web 2.0 application.
+This should give you some time to argue and launch additional hypothesis. However, we need a name, so let's call it: maskeet.
+
+h1. Plans for today
+
+The objective of the day is to display a page of the application in a web browser, and to set up a professional development environment. This includes 
+installation of Merb creation of an application and setup of a source version control system.
+We'll assume that you use a Unix-like system with Ruby 1.8.6 or later and Sqlite3 with the Ruby bindings installed. If you run a Windows system, don't 
+panic: it will also work fine, you'll just have to type a few commands in the cmd prompt.
+
+h5. NOTE: Unix shell commands can come in handy in a Windows environment. If you would like to use tools like tar, gzip, or grep on Windows you can 
+          install Cygwin. The official docs are a little sparse, so a good installation guide can be found here. The adventurous may also like to try 
+          Microsoft's Windows Services for Unix.
+
+h1. Merb installation
+
+The simplest way to install Merb is to use the RubyGems package, however to be able to install Merb you need to upgrade Rubygems to 1.3.1 or later:
+
+bq. $ gem update --system (you might need to be admin/root, or use sudo)
+
+h5. NOTE: RubyGems 1.1 and 1.2 have problems upgrading when there is no rubygems-update installed. You will need to follow the second set of update
+          instructions if you see "Nothing to update".
+
+If you have an older version of RubyGems installed, then you can still do it in two steps:
+
+bq. $ gem install rubygems-update (again, might need to be admin/root, or use sudo)
+    $ update_rubygems (... here too)
+
+You are ready to install the latest stable version of Merb together with all its dependencies:
+
+bq. $ gem install merb
+
+Check that Merb is installed by using the command line to check the version:
+
+bq. $ merb --version
+
+If you are curious about what this new command line tool can do for you, type merb --help to list the available options.
+
+h5. Note: Even though we install the entire Merb stack we'll be just using this components: Merb/Datamapper/Sqlite/Haml. 
+          Check http://wiki.merbivore.com/faqs/merb_components for more info about the different stacks.
+
+h1. Project Setup
+
+For starting new Merb projects you have to do something like the following:
+
+bq. $ merb-gen app maskeet --template-engine=haml
+
+This will generate a nice clean application that is ready for haml, datamapper, and rspec.
+
+h5. NOTE: Windows users are advised to run Merb and to setup their new project in a path which contains no spaces. 
+          Avoid using the Documents and Settings directory, including anywhere under My Documents (or Documents on Vista).
+
+h1. Test the new configuration
+
+Go to the directory where you create your Merb app and type:
+
+bq. $ merb
+
+You should see some information regarding the internal Merb web server and defaults configurations. Now type in your browser:
+
+bq. http://localhost:4000
+
+After this you should see the welcome screen for your new Merb app.
+
+h1. GitHub
+
+One of the good principles of lazy folks is not to worry about breaking existing code. Source version control allows us to:
+
+* work fast
+* revert to a previous version if a modification is inefficient
+* allow more than one person to work on the project
+* have access to all the daily versions of the application
+
+We will use GitHub for this purpose. We assume you have an account at GitHub.
+
+First, create a new repository for the maskeet project:
+
+* Login into your GitHub account
+* In your profile click the "create a new one" link
+* Put the name of your repository. For my case it will be maskeet but you can put anything you want.
+* Add a description
+* Hit create repository
+* After this GitHub folks were so kind that they give you a set of instructions to do what you need to get your code in there.
+
+Our code is under version control and git is already tracking changes. If you want to know more about source version control with Git, check 
+the Gitcasts site and Github guides.
+
+The maskeet Git repository is public. You can access it at:
+
+bq. http://github.com/cored/maskeet/tree/master
+
+Today's code has been committed, you can checkout the release_day_1 branch:
+
+h1. See you Tomorrow
+
+Well, it's already one hour! We talked a lot, and did nothing new for the Merb early adopters. But just have a look at what will be revealed for our 
+second day of the Merb advent calendar:
+
+* what the application will do
+* building the data model and generating the object-relational mapping
+* creating a module
+
+Make sure you come back tomorrow!

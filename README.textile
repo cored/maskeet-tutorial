@@ -1,0 +1,11 @@
+h1. Maskeet Tutorial
+
+This is the official documentation for the Maskeet tutorial. I began with this documentaion effort because i did not find 
+any good step by step tutorial for Merb.  
+
+This tutorial is a port of the Askeet tutorial (http://www.symfony-project.org/askeet/1_0/en).
+
+h1. Contribuiting
+
+You know the basics of contribuiting in Github just fork the project and begin throwing docs or code, check out the maskeet code too in it's own
+repository.
