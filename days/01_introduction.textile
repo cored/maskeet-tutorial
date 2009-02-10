@@ -56,7 +56,7 @@ bq. $ merb --version
 
 If you are curious about what this new command line tool can do for you, type merb --help to list the available options.
 
-h5. Note: Even though we install the entire Merb stack we'll be just using this components: Merb/Datamapper/Sqlite/Haml. 
+h5. NOTE: Even though we install the entire Merb stack we'll be just using this components: Merb/Datamapper/Sqlite/Haml. 
           Check http://wiki.merbivore.com/faqs/merb_components for more info about the different stacks.
 
 h1. Project Setup
