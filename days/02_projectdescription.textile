@@ -1,0 +1,88 @@
+h1. Previously
+
+During day one of this long but interesting tutorial, we saw how to install the Merb framework, setup a new application and development environment, 
+and bring safety to the code with source version control.
+The objectives for the second day are to define what the final result should be in terms of functionalities, sketch the data model, and begin coding. 
+This will include generating an object-relational mapping and using it interactively to create, retrieve and update records in a database with an 
+application scaffolding.
+
+That's quite a lot. Let's get started.
+
+h1. The project unveiled
+
+What do you want to know? That's an interesting question. There are many interesting questions, like:
+
+ * What shall I do
+ * end tonight with my girlfriend?
+ * How can I generate traffic to my blog?
+ * What's the best web application framework?
+ * What's the best affordable restaurant in Paris?
+ * What's the answer to life, the universe, and everything?
+
+All these questions don't have only one answer, and the best answer is a matter of opinion. As a matter of fact, the questions that only have one answer 
+are often the least interesting (like, how much is 1 + 1?) but the only ones to be solved on the web. That's not fair.
+
+Meet **Maskeet**. A website dedicated to help people find answers to their questions. Who will answer those ticklish questions? Everybody. And everybody 
+will be able to rate other people's answers, so that the most popular answers get more visibility. As the number of questions increases, it becomes 
+impossible to organize them in categories and sub-categories, so the creator of a question will be able to tag it with any word he/she wants, "à la" 
+"delicious"[:delicious]. Of course, the popularity of tags will have to be represented through a tag bubble. If one wants to follow the answers to a 
+particular question, he/she can subscribe to this question's RSS feed. All these functionalities have to be elegant and lightweight, so all the 
+interactions that don't actually need a new page have to be of AJAX type. Eventually, a back-end is necessary to moderate questions and answers reported as 
+spam, or to push artificially a question that the administrator finds encouraging.
+
+Then you should ask: Haven't I already seen such a website on the web? Well, if you actually did, we're busted, but if you refer to "faqts"[:faqts], 
+"eHow"[:ehow], "Ask Jeeves"[:ask] or something similar, with no collaborative answers, no AJAX, no RSS and no tags, this is not the same website. We are 
+talking about a web 2.0 application here.
+
+The big deal about maskeet is that it is not only a website, it is an application that anyone can download, install at home or in a company Intranet, 
+tweak and add features to. The source code will be released with an open-source license. Your HR head is looking for a knowledge management system? 
+You want to keep track of all the tricks you learned about fixing your car? You don't want to develop a Frequently Asked Questions section for your 
+website? Search no more, for maskeet exists. Well, it will exist.
+
+h1. Where to start?
+
+So how are you supposed to start a Merb application? It all depends on you. You could write stories, do a planning game and find a partner to do
+pair programming if you were an XP adept, or write a detailed specification of the website, together with a sketch of all the objects, states, 
+interactions and so on if you were a UML fan.
+
+But this tutorial isn't about application development in general, so we'll start with a basic relational data model, and add working features one by one. 
+What we need is an application that can be used at the end of every day, not a gigantic ongoing bunch of code that never outputs anything. In an ideal 
+world, we should write unit tests for any feature we add, but we honestly won't have time for that. One day will be dedicated to unit tests though, so 
+keep on reading.
+
+For this project, we will use a SQLite database. 
+
+h1. Data Model
+
+h3. Relational model
+
+Obviously, there will be a 'question' and an 'answer' tables. We'll need a 'user' table, and we'll store the interest of users for a question in a 
+'interest' table, and the relevancy given by a person to an answer in a 'relevancy' table.
+
+Users will have to be identified to add a question, to rate the relevancy an answer, or to declare interest to a question. Users won't need to be 
+identified to add an answer, but an answer will always be linked to a user so that users with popular answers can be distinguished. The answers entered 
+without any identification will be shown as contributions of a generic user, called 'Anonymous Coward'. It's easier to understand with an entity 
+relationship diagram:
+
+<img src="http://www.symfony-project.org/images/askeet/1_0/mcd1.gif" alt="maskeet_diagram" />
+
+Notice that we've declared a created_at field for each table. dm-timestamp which is a module for Datamapper recognizes such fields and sets the value to 
+the current system time when a record is created. That's the same for updated_at fields: Their value is set to the system time whenever the record is 
+updated.
+
+The relational model has to be translated to Ruby code for Datamapper to understand it. There are two ways to write this files: by hand, and that's the 
+way we like it, or from an existing database. Let's see the first solution.
+
+First let's ask Merb to create the skeleton for the different models for us.
+
+bq. $ merb-gen model --testing-framework rspec --orm datamapper question
+bq. $ merb-gen model --testing-framework rspec --orm datamapper answer
+bq. $ merb-gen model --testing-framework rspec --orm datamapper interest
+bq. $ merb-gen model --testing-framework rspec --orm datamapper relevancy
+
+h5. NOTE: As you already notice we did not create a user model because the merb-auth-slice provides you with one and we will use it. 
+
+[delicious]http://delicious.com
+[faqts]http://www.faqts.com/
+[ehow]http://www.ehow.com/
+[ask]http://www.ask.com/
