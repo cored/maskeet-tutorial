@@ -85,6 +85,26 @@ bq. $ merb-gen model --testing-framework rspec --orm datamapper relevancy
 
 h5. NOTE: As you already notice we did not create a user model because the merb-auth-slice provides you with one and we will use it. 
 
+Now for the funny part let's add the code for each model:
+
+bq. #app/models/question
+    class Question
+      include DataMapper::Resource
+      
+      # model fields definition 
+      property :id, Serial
+      property :title, String
+      property :body, String
+      
+      # model associations
+      has n, :answer
+      belongs_to :user
+
+      # updated_at created_at definition (provided by dm-timestamp)
+      timestamps :at
+    end
+bq.
+
 [delicious]http://delicious.com
 [faqts]http://www.faqts.com/
 [ehow]http://www.ehow.com/
