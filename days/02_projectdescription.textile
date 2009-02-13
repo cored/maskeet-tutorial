@@ -76,9 +76,12 @@ way we like it, or from an existing database. Let's see the first solution.
 First let's ask Merb to create the skeleton for the different models for us.
 
 bq. $ merb-gen model --testing-framework rspec --orm datamapper question
-    $ merb-gen model --testing-framework rspec --orm datamapper answer
-    $ merb-gen model --testing-framework rspec --orm datamapper interest
-    $ merb-gen model --testing-framework rspec --orm datamapper relevancy
+
+bq. $ merb-gen model --testing-framework rspec --orm datamapper answer
+
+bq. $ merb-gen model --testing-framework rspec --orm datamapper interest
+
+bq. $ merb-gen model --testing-framework rspec --orm datamapper relevancy
 
 h5. NOTE: As you already notice we did not create a user model because the merb-auth-slice provides you with one and we will use it. 
 
