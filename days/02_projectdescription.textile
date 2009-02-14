@@ -87,7 +87,7 @@ h5. NOTE: As you already notice we did not create a user model because the merb-
 
 Now for the funny part let's add the code for each model:
 
-bq. #app/models/question
+bq. #app/models/question.rb
     class Question
       include DataMapper::Resource
       
@@ -103,7 +103,64 @@ bq. #app/models/question
       # updated_at created_at definition (provided by dm-timestamp)
       timestamps :at
     end
-bq.
+
+bq. #app/models/answer.rb  
+    class Answer
+      include DataMapper::Resource
+
+      property :id, Serial
+      property :body, String
+
+      has n, :relevancies
+      belongs_to :question
+      belongs_to :user
+
+      timestamps :at
+    end
+
+bq. #app/models/interest.rb
+    class Interest
+      include DataMapper::Resource
+
+      property :user_id, Integer, :key => true
+      property :question_id, Integer, :key => true
+
+      belongs_to :question
+      belongs_to :user
+
+      timestamps :at
+    end
+
+bq. #app/models/relevancy.rb
+    class Relevancy
+      include DataMapper::Resource
+
+      property :id, Serial
+      property :score, Integer
+
+      belongs_to :answer
+      belongs_to :user
+
+      timestamps :at
+    end
+
+bq. #app/models/user.rb
+    class User
+      include DataMapper::Resource
+
+      property :id,     Serial
+      property :login,  String
+      property :first_name, String
+      property :last_name, String
+
+      has n, :questions
+      has n, :answers
+      has n, :relevancies
+      has n, :interests
+      has n, :questions, :through => :interests
+
+      timestamps :at
+    end
 
 [delicious]http://delicious.com
 [faqts]http://www.faqts.com/
