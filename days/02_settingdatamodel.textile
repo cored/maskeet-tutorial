@@ -1,0 +1,301 @@
+h1. Previously
+
+During day one of this long but interesting tutorial, we saw how to install the Merb framework, setup a new application and development environment, 
+and bring safety to the code with source version control.
+The objectives for the second day are to define what the final result should be in terms of functionalities, sketch the data model, and begin coding. 
+This will include generating an object-relational mapping and using it interactively to create, retrieve and update records in a database with an 
+application scaffolding.
+
+That's quite a lot. Let's get started.
+
+h1. The project unveiled
+
+What do you want to know? That's an interesting question. There are many interesting questions, like:
+
+ * What shall I do
+ * end tonight with my girlfriend?
+ * How can I generate traffic to my blog?
+ * What's the best web application framework?
+ * What's the best affordable restaurant in Paris?
+ * What's the answer to life, the universe, and everything?
+
+All these questions don't have only one answer, and the best answer is a matter of opinion. As a matter of fact, the questions that only have one answer 
+are often the least interesting (like, how much is 1 + 1?) but the only ones to be solved on the web. That's not fair.
+
+Meet **Maskeet**. A website dedicated to help people find answers to their questions. Who will answer those ticklish questions? Everybody. And everybody 
+will be able to rate other people's answers, so that the most popular answers get more visibility. As the number of questions increases, it becomes 
+impossible to organize them in categories and sub-categories, so the creator of a question will be able to tag it with any word he/she wants, "à la" 
+"delicious"[:delicious]. Of course, the popularity of tags will have to be represented through a tag bubble. If one wants to follow the answers to a 
+particular question, he/she can subscribe to this question's RSS feed. All these functionalities have to be elegant and lightweight, so all the 
+interactions that don't actually need a new page have to be of AJAX type. Eventually, a back-end is necessary to moderate questions and answers reported as 
+spam, or to push artificially a question that the administrator finds encouraging.
+
+Then you should ask: Haven't I already seen such a website on the web? Well, if you actually did, we're busted, but if you refer to "faqts"[:faqts], 
+"eHow"[:ehow], "Ask Jeeves"[:ask] or something similar, with no collaborative answers, no AJAX, no RSS and no tags, this is not the same website. We are 
+talking about a web 2.0 application here.
+
+The big deal about maskeet is that it is not only a website, it is an application that anyone can download, install at home or in a company Intranet, 
+tweak and add features to. The source code will be released with an open-source license. Your HR head is looking for a knowledge management system? 
+You want to keep track of all the tricks you learned about fixing your car? You don't want to develop a Frequently Asked Questions section for your 
+website? Search no more, for maskeet exists. Well, it will exist.
+
+h1. Where to start?
+
+So how are you supposed to start a Merb application? It all depends on you. You could write stories, do a planning game and find a partner to do
+pair programming if you were an XP adept, or write a detailed specification of the website, together with a sketch of all the objects, states, 
+interactions and so on if you were a UML fan.
+
+But this tutorial isn't about application development in general, so we'll start with a basic relational data model, and add working features one by one. 
+What we need is an application that can be used at the end of every day, not a gigantic ongoing bunch of code that never outputs anything. In an ideal 
+world, we should write unit tests for any feature we add, but we honestly won't have time for that. One day will be dedicated to unit tests though, so 
+keep on reading.
+
+For this project, we will use a SQLite database. 
+
+h1. Data Model
+
+h3. Relational model
+
+Obviously, there will be a 'question' and an 'answer' tables. We'll need a 'user' table, and we'll store the interest of users for a question in a 
+'interest' table, and the relevancy given by a person to an answer in a 'relevancy' table.
+
+Users will have to be identified to add a question, to rate the relevancy an answer, or to declare interest to a question. Users won't need to be 
+identified to add an answer, but an answer will always be linked to a user so that users with popular answers can be distinguished. The answers entered 
+without any identification will be shown as contributions of a generic user, called 'Anonymous Coward'. It's easier to understand with an entity 
+relationship diagram:
+
+<img src="http://www.symfony-project.org/images/askeet/1_0/mcd1.gif" alt="maskeet_diagram" />
+
+Notice that we've declared a created_at field for each table. dm-timestamp which is a module for Datamapper recognizes such fields and sets the value to 
+the current system time when a record is created. That's the same for updated_at fields: Their value is set to the system time whenever the record is 
+updated.
+
+The relational model has to be translated to Ruby code for Datamapper to understand it. There are two ways to write this files: by hand, and that's the 
+way we like it, or from an existing database. Let's see the first solution.
+
+First let's ask Merb to create the skeleton for the different models for us.
+
+bq. $ merb-gen model --testing-framework rspec --orm datamapper question
+
+bq. $ merb-gen model --testing-framework rspec --orm datamapper answer
+
+bq. $ merb-gen model --testing-framework rspec --orm datamapper interest
+
+bq. $ merb-gen model --testing-framework rspec --orm datamapper relevancy
+
+h5. NOTE: As you already notice we did not create a user model because the merb-auth-slice provides you with one and we will use it. 
+
+Now for the funny part let's add the code for each model:
+
+bq. #app/models/question.rb
+
+  class Question
+    include DataMapper::Resource
+    # model fields definition 
+    property :id, Serial
+    property :title, String
+    property :body, String
+    # model associations
+    has n, :answer
+    belongs_to :user
+    # updated_at created_at definition (provided by dm-timestamp)
+    timestamps :at
+  end
+
+bq. #app/models/answer.rb   
+
+  class Answer
+    include DataMapper::Resource
+    property :id, Serial
+    property :body, String
+    has n, :relevancies
+    belongs_to :question
+    belongs_to :user
+    timestamps :at
+  end
+
+bq. #app/models/interest.rb
+
+  class Interest
+    include DataMapper::Resource
+    property :user_id, Integer, :key => true
+    property :question_id, Integer, :key => true
+    belongs_to :question
+    belongs_to :user
+    timestamps :at
+  end
+
+bq. #app/models/relevancy.rb
+
+  class Relevancy
+    include DataMapper::Resource
+    property :id, Serial
+    property :score, Integer
+    belongs_to :answer
+    belongs_to :user
+    timestamps :at
+  end
+
+bq. #app/models/user.rb
+
+  class User
+    include DataMapper::Resource
+    property :id,     Serial
+    property :login,  String
+    property :first_name, String
+    property :last_name, String
+    has n, :questions
+    has n, :answers
+    has n, :relevancies
+    has n, :interests
+    has n, :questions, :through => :interests
+    timestamps :at
+  end
+
+h1. The Database
+
+Connection
+As we are using SQLite you just need to specified to Merb where to find the database file, let's create a 'data' directory that will have the
+database: 
+
+bq. $ mkdir data
+
+Now open the maskeet/config/database.yml configuration file. If this is your first time with Merb, you will discover that the Merb configuration 
+files are written in YAML. The syntax is very simple, but there is one major obligation in YAML files: never use tabulations, always use spaces. 
+Once you know that, you are ready to edit the file and enter the actual connection settings to your database under the all: category:
+
+  development: &defaults
+    # These are the settings for repository :default
+    adapter:  sqlite3
+    database: data/maskeet.db
+
+For you keyboard fans, here is a surprise: You don't need to create the tables and the columns in the database. You did it once in the app/models 
+directory, so Merb will build the SQL statement creating all that for you:
+
+bq. $ rake db:automigrate
+
+h1. Test data access via a CRUD
+
+It is always good to see that the work done is useful. Until now, your browser wasn't of any use, and yet we are supposed to build a web application... 
+So let's create a basic set of Merb templates and actions to manipulate the data of the 'question' table. This will allow you to create a few questions 
+and display them.
+
+As Merb don't provides us with a lot of magic and that's the way we like it, we will write some code now but don't worry it's just a little bit.
+First let's create a basic skeleton for a module in Merb. Inside the maskeet directory type the following: 
+
+bq. $ merb-gen resource question
+
+This generates a scaffolding for a question module, based on the Question object model, with basic Create Retrieve Update Delete actions (which 
+explains the CRUD acronym). Don't get confused: A scaffolding is not a finished application, but the basic structure on top of which you can develop 
+new features, add business rules and customize the look and feel.
+
+The list of all the actions created by a CRUD generator is:
+
+|_.Action name|_.Description|
+|list|shows all the records of a table|
+|index|forwards to list|
+|show|shows all the fields of a given record|
+|edit|displays a form to create a new record or edit an existing one|
+|update|modifies a record according to the parameters given in the request, then forwards to show|
+|delete|deletes a given record from the table|
+
+In the maskeet/app/controllers/ directory, notice the new question controller and browse its source. You may like to check the views for it too
+in the maskeet/app/views/questions.
+
+Now let's change the code for the views because they are just skeleton's.  
+
+bq. #app/views/questions/edit.html.haml
+
+ %h1 Edit Question
+  = error_messages_for @question
+  = form_for(@question, :action => url(:question, @question)) do
+    %p= text_field :title, :label => "Title: "  
+    %p= text_area :body, :label => "Body: "
+    %p= submit "Update"
+  = link_to 'Show', url(:question, @question)
+  |
+  = link_to 'Back', url(:questions)
+
+bq. #app/views/questions/index.html.haml
+
+ %h1 Questions
+ %table
+  %thead
+   %tr
+    %th Id
+    %th User id
+    %th Title
+    %th Body
+  %tbody
+   %tr
+   - for question in @questions
+     %tr
+      %td
+        = question.id
+      %td
+        = question.user
+      %td
+        = question.title
+      %td
+        = question.body
+      %td
+        = link_to 'Show', url(:question, question)
+      %td
+        = link_to 'Edit', url(:edit_question,  question)
+  = link_to 'New', url(:new_question)
+
+bq. #app/views/questions/new.html.haml
+
+ %h1 New Question
+  = error_messages_for @question
+  = form_for(@question, :action => url(:questions) ) do
+    %p= text_field :title, :label => "Title : "
+    %p= text_area :body, :label => "Body : "
+    %p= submit "Create"
+  = link_to 'Back', url(:questions)
+
+bq. #app/views/questions/show.html.haml
+
+ %table
+  %tbody
+   %tr
+     %th Id:
+     %td= @question.id
+   %tr
+     %th Title:
+     %td= @question.title
+   %tr
+     %th Body:
+     %td= @question.body
+ = link_to 'Edit',  url(:edit_question,  @question)
+ |
+ = link_to 'Back', url(:questions)
+
+You can now start the webserver with:
+
+bq. $ merb
+
+And test the application go to:
+
+bq. http://localhost:4000/questions
+
+Go ahead, play with it. Add a few questions, edit them, list them, delete them. If it works, this means that the object model is correct, that the 
+connection to the database is correct, and that the mapping between the relational model of the database and the object model of Merb is correct. 
+That's a good functional test.
+
+h1. See you Tomorrow
+
+You didn't write too much Ruby code, yet you have a basic application to use. That's not bad for the second day. Tomorrow, we'll start writing some code 
+in order to have a welcoming home page that displays the list of questions. We will also add test data to our database using a batch process, and learn 
+how to extend the model.
+
+Now that you know what the application will do you may be able to imagine an additional feature to it. 
+
+Feel free to browse the source of today's tutorial at:
+
+bq. http://github.com/cored/maskeet
+ 
+[delicious]http://delicious.com
+[faqts]http://www.faqts.com/
+[ehow]http://www.ehow.com/
+[ask]http://www.ask.com/

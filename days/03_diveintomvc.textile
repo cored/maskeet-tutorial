@@ -1,0 +1,60 @@
+h1. Previously on symfony
+
+During day two you learned how to build an object model based on a relational data model, and generate scaffolding for one of these objects. 
+By the way, the code of the application generated during the previous days is available in the maskeet GIT repository at:
+
+http://github.com/maskeet
+
+The objectives for the third day are to define a nicer layout for the site, define the list of questions as the default homepage, show the 
+number of users interested by one question, and populate the database from sample text files in order to have test data. That's not much to 
+do, but quite a lot to read and understand.
+
+h1. The MVC model
+
+Today will be the first dive in the world of the MVC architecture. What does this mean? Simply that the code used to generate one page is located in 
+various files according to its nature.
+
+If the code concerns data manipulation independent from a page, it should be located in the Model (most of the time in maskeet/app/models/). If it 
+concerns the final presentation, it should be located in the View; in Merb, the view layer relies on templates (for instance in 
+maskeet/app/views/questions/). Eventually, the code dedicated to tie all this together and to translate the site logic into good old Ruby is located 
+in the Controller. (Look for controllers in askeet/app/controllers/).
+
+h5. NOTE: Check the chapter on MVC in the Merb Book (http://book.merbist.com/getting-started/mvc)
+
+h1. Change the layout
+
+In application of the decorator design pattern, the content of the template called by an action is integrated into a global template, or layout. 
+In other words, the layout contains all the invariable parts of the interface, it "decorates" the result of controllers. Open the default 
+layout (located in maskeet/app/views/layout/application.html.haml) and change it to the following:
+
+  !!! Strict
+    %html{ html_attrs("en_us") }
+     %head
+      %title
+        Maskeet
+      %meta{ :content => "text/html; charset=utf-8", "http-equiv" => "content-type" }/
+      %link{ :href => "/stylesheets/master.css", :rel => "stylesheet", :media => "screen", :type => "text/css", :charset => "utf-8" }/
+      %link{ :href => "/stylesheets/layout.css", :rel => "stylesheet", :media => "screen", :type => "text/css", :charset => "utf-8" }/
+      %link{ :href => "/stylesheets/public static void main(String[] args) { }.css", :rel => "stylesheet", :media => "screen", :type => "text/css", :charset => "utf-8" }
+     %body
+      %div#header
+       %ul
+        %li= link_to 'about', url(:questions)
+       %h1= link_to 'logo', url(:questions)
+      %div#content
+       %div#content_main
+        = catch_content :for_layout
+        %div.verticalalign
+       %div#content_bar
+        %div.verticalalign
+
+h5. NOTE: We tried to keep the markup as semantic as possible, and to move all the styling into the CSS stylesheets. 
+          These stylesheets won't be described here, since CSS syntax is not the purpose of this tutorial. They are available for download though, 
+          in the Git repository.
+          We created two stylesheets (main.css and layout.css). Copy them into your maskeet/public/stylesheets/ directory. 
+
+This layout is still lightweight for the moment, it will be rebuilt later (in about a week). Check that the modifications display correctly by requesting 
+the home page.
+
+bq. http://localhost:4000
+
