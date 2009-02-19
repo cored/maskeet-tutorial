@@ -56,5 +56,18 @@ h5. NOTE: We tried to keep the markup as semantic as possible, and to move all t
 This layout is still lightweight for the moment, it will be rebuilt later (in about a week). Check that the modifications display correctly by requesting 
 the home page.
 
-bq. http://localhost:4000
+h1. Redefine the default homepage
 
+For now, if you request the home page of the new website, it shows 'The Merb default page'. A better idea will be to show the list of questions (referenced
+in this documents as question/list and translated as: the list action of the question controller). To do this open the routing configuration, found in
+config/router.rb and locate this line:
+
+bq. # match('/').to(:controller => 'whatever', :action =>'index')
+
+Change it to:
+
+bq.  match('/').to(:controller => 'questions', :action =>'index')
+
+Refresh the home page (http://localhost:4000/); it now display the list of questions. 
+
+h5. NOTE: The posibilities of the routing system will be detailed in the near future but if you are curious you can check the Merb wiki and search for 'routing'.
